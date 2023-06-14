@@ -45,4 +45,3 @@ Details on Jax installation can be found https://github.com/google/jax
 [Demo Lens shape optimization with Installation Guide](https://colab.research.google.com/drive/1FdzNLfRtQDwqgn2NaoXE_66t68sRPzAv?authuser=2#scrollTo=wrTXUUlk5Cmk)
 
 [Demo Flat Lens shape optimization](https://colab.research.google.com/drive/1578cQ-ZtrGUE3I22Gxmwu1MA_TaVQZd2)
-
