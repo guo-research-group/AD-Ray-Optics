@@ -18,7 +18,7 @@ refractive and diffractive optics optimization. It could be a useful computation
   
 ![comparison](https://github.com/guo-research-group/AD-Ray-Optics/blob/main/No%20of%20Parameters%20vs%20Time.png)
 
-*Optimization of 4 flat Lenses with zoom effect
+* Optimization of 4 flat Lenses with zoom effect
 
 ![lenses](https://github.com/guo-research-group/AD-Ray-Optics/blob/main/pic.JPG)
 
