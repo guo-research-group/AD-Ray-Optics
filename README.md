@@ -1,14 +1,17 @@
 # AD Ray-Optics : A Differentiable Ray Tracing Framework
-Ray Optics is a Python geometrical optics and image forming optics library. Though it provides a geometric ray tracing foundation for an optical system but the original Ray Optics does not come with auto differentiation feature.
-This Differentiable Ray Optics library is based on original Ray Optics and modified using Google-Jax to make it auto differentiable.
-Differentiable Ray Optics provides : 
-* Validated, auto-differentiable (AD) framework for optical systems built on numpy and Google-Jax
-* Low Computational cost 
+Auto Differentiable Ray Optics (AD Ray-Optics), a computationally efficient framework for differentiable ray tracing on multi-layer refractive and diffractive optics design. It builds on the existing Python Ray Optics Library and Google Jax.
+Given the sequential model of a lens design, AD RayOptics precompiles a computational graph that computes gradients of light rays ⃗v_i
+, i = 1, 2, 3, · · · w.r.t. lens parameters ⃗θ_i, i = 1, 2, 3, · · · via automatic differentiation. In contrast to finite difference, which becomes computationally expensive when the number of parameters in an optical system becomes high, and is prone to numerical error, the proposed automatic differentiation framework improves the speed and stability of calculating gradients. We validate AD Ray-Optics against finite difference gradient
+calculation through experiments and show that AD Ray-Optics achieves at least 30 times faster speed than finite difference gradient calculation.
+We demonstrate several use cases of AD Ray-Optics, including single lens optimization, cascade lens optimization, and hybrid
+refractive and diffractive optics optimization. It could be a useful computational backbone for end-to-end computational imaging and photography.
+
 
 ## Benefits of Using Differentiable Ray Optics 
-In Ray Tracing, conventional gradient calculation techniques become computationally expensive when number of parameters in an optical system goes high.
-In Automatic Differentiation optical parameters are calculated together with gradient.This helps to improve speed and accuracy of common optical design tasks.
-
+* Based on Numpy and Jax
+* Computationally Efficient
+* Compatible with both refractive and diffractive optics. 
+  
 Without Gradient| With Gradient
 -------------|-----------------
 Optical Parameters: 5 | Optical Parameters: 5
