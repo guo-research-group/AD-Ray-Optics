@@ -1,5 +1,6 @@
 # AD Ray-Optics : A Differentiable Ray Tracing Framework
 ![Image model ](https://github.com/guo-research-group/AD-Ray-Optics/blob/main/image%20model.JPG)
+
 Auto Differentiable Ray Optics (AD Ray-Optics), a computationally efficient framework for differentiable ray tracing on multi-layer refractive and diffractive optics design. It builds on the existing Python Ray Optics Library and Google Jax.
 Given the sequential model of a lens design, AD Ray Optics precompiles a computational graph that computes gradients of light rays via automatic differentiation. In contrast to finite difference, which becomes computationally expensive when the number of parameters in an optical system becomes high, and is prone to numerical error, the proposed automatic differentiation framework improves the speed and stability of calculating gradients. We validate AD Ray-Optics against finite difference gradient
 calculation through experiments and show that AD Ray-Optics achieves at least 30 times faster speed than finite difference gradient calculation.
