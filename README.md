@@ -11,6 +11,10 @@ refractive and diffractive optics optimization. It could be a useful computation
 * Computationally Efficient
 * Compatible with both refractive and diffractive optics. 
   
+## Results
+![comparison](https://github.com/guo-research-group/AD-Ray-Optics/blob/main/No%20of%20Parameters%20vs%20Time.png)
+
+
 Without Gradient| With Gradient
 -------------|-----------------
 Optical Parameters: 5 | Optical Parameters: 5
