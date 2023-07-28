@@ -4,7 +4,7 @@ Given the sequential model of a lens design, AD RayOptics precompiles a computa
 , i = 1, 2, 3, · · · w.r.t. lens parameters ⃗θ_i, i = 1, 2, 3, · · · via automatic differentiation. In contrast to finite difference, which becomes computationally expensive when the number of parameters in an optical system becomes high, and is prone to numerical error, the proposed automatic differentiation framework improves the speed and stability of calculating gradients. We validate AD Ray-Optics against finite difference gradient
 calculation through experiments and show that AD Ray-Optics achieves at least 30 times faster speed than finite difference gradient calculation.
 We demonstrate several use cases of AD Ray-Optics, including single lens optimization, cascade lens optimization, and hybrid
-refractive and diffractive optics optimization. It could be a useful computational backbone for end-to-end computational imaging and photography.
+refractive and diffractive optics optimization. It could be a useful computational backbone for endtoend computational imaging and photography.
 
 
 ## Benefits of Using Differentiable Ray Optics 
