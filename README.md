@@ -13,7 +13,7 @@ refractive and diffractive optics optimization. It could be a useful computation
   
 ## Results
 
-* Performance comparison between finite difference and automatic differentiation method. Time to optimize the lens parameters using auto diff 
+* Performance comparison between finite difference and automatic differentiation. Time to optimize the lens parameters using auto diff 
   linearly increases with the number of parameters.
   
 ![comparison](https://github.com/guo-research-group/AD-Ray-Optics/blob/main/No%20of%20Parameters%20vs%20Time.png)
