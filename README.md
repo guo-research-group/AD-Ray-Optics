@@ -18,6 +18,10 @@ refractive and diffractive optics optimization. It could be a useful computation
   
 ![comparison](https://github.com/guo-research-group/AD-Ray-Optics/blob/main/No%20of%20Parameters%20vs%20Time.png)
 
+*Optimization of 4 flat Lenses with zoom effect
+
+![lenses](https://github.com/guo-research-group/AD-Ray-Optics/blob/main/pic.JPG)
+
 ## Usage and Documentation
 For usage and documentation, a readthedocs page is in active development. Examples for optical system design are provided in Ray-Optics/Examples/. Additional examples will be provided in the future (we welcome community made examples). 
 
