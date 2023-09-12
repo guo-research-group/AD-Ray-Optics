@@ -28,7 +28,7 @@ For usage and documentation, a readthedocs page is in active development. Exampl
 ### a) Install and Run Differentiable Ray Optics on Google Colab
 Differentiable Ray Optics can be easily installed on Google Colab. 
 
-`!git clone https://github.itap.purdue.edu/guo-research-group/Ray-Optics`
+`!git clone https://github.com/guo-research-group/AD-Ray-Optics`
 
 `%cd /content/Ray-Optics`
 
@@ -37,7 +37,7 @@ Differentiable Ray Optics can be easily installed on Google Colab.
 ### b) Install and run Locally 
 AD Ray-Optics library is tested in Linux environment as Jax libraries can be installed only in Linux. Windows users can use JAX on CPU and GPU via the Windows Subsystem for Linux.
 
-`git clone https://github.itap.purdue.edu/guo-research-group/Ray-Optics`
+`git clone https://github.com/guo-research-group/AD-Ray-Optics`
 
 `cd Ray-Optics`
 
