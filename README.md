@@ -51,6 +51,6 @@ You can then install additional dependencies via
 Details on Jax installation can be found https://github.com/google/jax
 
 ## Examples
-[Demo Lens shape optimization with Installation Guide](https://colab.research.google.com/drive/1FdzNLfRtQDwqgn2NaoXE_66t68sRPzAv?authuser=2#scrollTo=wrTXUUlk5Cmk)
+[Demo Lens shape optimization with Installation Guide](https://colab.research.google.com/drive/1gQm1nHchbLEItYTOgQz8Wboy1Xkp8tPM)
 
 [Demo Flat Lens shape optimization](https://colab.research.google.com/drive/1578cQ-ZtrGUE3I22Gxmwu1MA_TaVQZd2)
