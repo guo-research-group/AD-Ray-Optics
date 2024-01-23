@@ -36,9 +36,6 @@ def visualize_rays(sm, max_angle, wv, x_offsets, y_offsets, z_offsets, num_rays)
     random.seed(5)
     color = ["#" + ''.join([random.choice(hexadecimal_alphabets) for j in
     range(6)]) for i in range(number_of_colors)]
-
-    #Max Angle of Rays
-    max_angle = 1/180*np.pi*10 # max incident angle, rad
     
     # Tan Angle Offsets
     angle_offsets = np.linspace(-max_angle, max_angle, num_rays)
