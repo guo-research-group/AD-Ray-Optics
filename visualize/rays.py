@@ -1,7 +1,7 @@
-from matplotlib.ticker import AutoMinorLocator
-from mpl_toolkits.mplot3d import Axes3D
 import plotly.graph_objects as go
 from scipy.spatial import *
+import numpy as np
+from rayoptics.raytr.trace import trace
 
 def visualize_rays(sm=None, max_angle=None, wv= 400.5618, x_offsets=[0], y_offsets=[0], num_rays= 1, color = 'green'):
     """
