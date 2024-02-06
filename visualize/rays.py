@@ -14,7 +14,6 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
     wv (float): The wavelength of the rays.
     x_offsets (list): The x-coordinates of the starting points of the rays.
     y_offsets (list): The y-coordinates of the starting points of the rays.
-    z_offsets (list): The z-coordinates of the starting points of the rays.
     num_rays (int): The number of rays to visualize from each starting point. The total number of rays at each starting point is num_rays^2.
 
     Returns:
