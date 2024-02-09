@@ -1,7 +1,10 @@
 from matplotlib.ticker import AutoMinorLocator
 from mpl_toolkits.mplot3d import Axes3D
 import plotly.graph_objects as go
+import numpy as np
 from scipy.spatial import *
+from rayoptics.raytr.trace import *
+
 
 def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[0], y_offsets=[0], num_rays= 1, color = 'green'):
     """
@@ -48,7 +51,7 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
                 cs = np.cos(inc_angle)
                 tn = np.tan(ray)
 
-                st_coord = np.array([x_offset * 0.1 ,y_offset * 0.1, 0]) # Ray start Co-ord (Add offsets here to alter starting position)
+                st_coord = np.array([x_offset ,y_offset, 0]) # Ray start Co-ord (Add offsets here to alter starting position)
 
                 st_dir = np.array([tn,si,cs]) # Ray starting direction
 
