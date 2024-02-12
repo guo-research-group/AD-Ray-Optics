@@ -73,7 +73,7 @@ def visualize_lens(sm, N = 100 , radius = 2):
       i, j, k = tri.simplices.T
 
       # Adds mesh to plotly data for plotting
-      data.append(go.Mesh3d(x=x, y=z, z=y, i=i, j=j, k=k, intensity=x, color='blue', opacity=0.5))
+      data.append(go.Mesh3d(x=x, y=z, z=y, i=i, j=j, k=k, color='blue', opacity=0.5))
 
       if prev_mesh == [[],[],[]]:
         continue
