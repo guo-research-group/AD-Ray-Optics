@@ -58,7 +58,7 @@ Details on Jax installation can be found https://github.com/google/jax
 
 ### 3D Visualization
 
-[OPTI-517 Lens Example](https://colab.research.google.com/drive/1CvfLZNfCGWwjghBDEJNXqR49LCiE5BkP?usp=sharing)
+[Triplet Lens Example](https://colab.research.google.com/drive/1CvfLZNfCGWwjghBDEJNXqR49LCiE5BkP?usp=sharing)
 
 [Zooming Lens Example](https://colab.research.google.com/drive/1C-32HZodf7q7e0mvwoo_hNB0SBJutiYU?usp=sharing)
 
