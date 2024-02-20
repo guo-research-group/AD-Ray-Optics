@@ -37,6 +37,25 @@ def main():
 
   # define interface and gap data
   opm.radius_mode = True
+  init_gap = st.slider('Initial Gap', 1.0, 100.0, 15.0, 1.0)
+  sm.gaps[0].thi= init_gap
+
+  # add the surfaces
+  sm.add_surface([23.713, 4.831, 'N-LAK9', 'Schott'])
+  sm.add_surface([7331.288, 5.86])
+  sm.add_surface([-24.456, .975, 'N-SF5,Schott'])
+  sm.add_surface([21.896, 4.822])
+  sm.add_surface([86.759, 3.127, 'N-LAK9', 'Schott'])
+  sm.add_surface([-20.4942, 41.2365])
+
+
+  # update the model
+  opm.update_model()
+  data = visualize_lens(sm, radius = 7)
+  data.extend(visualize_rays(sm,0,6,wv,x_offsets=np.linspace(-3,3,5), y_offsets=np.linspace(-5,1,5), color = "red"))
+  figure = go.Figure(data = data)
+  figure.update_scenes(aspectmode='data')
+  st.plotly_chart(figure)
   def_code ="""
 sm.gaps[0].thi= 15
 
@@ -58,10 +77,11 @@ figure.update_scenes(aspectmode='data')
 st.plotly_chart(figure)
 """
 
-
+  
   code = st.text_area("Code", value = def_code, height = 200)
   if st.button("Run"):
     exec(code)
+  
   
 if __name__ == "__main__":
   main()
