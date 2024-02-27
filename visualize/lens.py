@@ -38,24 +38,39 @@ def visualize_lens(sm, N = 100 , radius = 2):
       mesh = [[],[],[]]
       surf = sm.ifcs[surf_num]
       sd = np.max([surf.surface_od(),sd])
-      #print(np.linspace(-sd,sd,50))
-      for xj in np.linspace(-sd, sd, N):
-        for yk in np.linspace(-sd,sd, N):
-            if ((xj **2 + yk ** 2) > (radius ** 2)):
-              continue
-            z = surf.profile.sag(xj,yk) + z_bias
-            if (z_bias + sm.gaps[surf_num].thi >= z):
-              mesh[0].append(xj)
-              mesh[1].append(yk)
-              mesh[2].append(z)
-      for angle in np.linspace(0, np.pi, 360):
-        x = radius * np.cos(angle)
-        y = radius * np.sin(angle)
-        z = surf.profile.sag(x,y) + z_bias
-        #print(x,y,np.nan_to_num(z))
-        volume_mesh[0].append(x)
-        volume_mesh[1].append(y)
-        volume_mesh[2].append(z)
+      # Create a grid of x and y coordinates
+      x, y = np.meshgrid(np.linspace(-sd, sd, N), np.linspace(-sd, sd, N))
+
+      # Create a mask for points inside the circle
+      mask = x**2 + y**2 <= radius**2
+
+      # Apply the mask to the x and y coordinates
+      x, y = x[mask], y[mask]
+
+      # Compute the z coordinates
+      z = surf.profile.sag(x, y) + z_bias
+      # Create a mask for points where z is less than or equal to z_bias + sm.gaps[surf_num].thi
+      mask = z <= z_bias + sm.gaps[surf_num].thi
+
+      # Apply the mask to the x, y, and z coordinates
+      x, y, z = x[mask], y[mask], z[mask]
+
+      # Create the mesh
+      mesh = [x, y, z]
+      # Create an array of angles
+      angles = np.linspace(0, np.pi, 360)
+
+      # Compute the x and y coordinates
+      x = radius * np.cos(angles)
+      y = radius * np.sin(angles)
+
+      # Compute the z coordinates
+      z = surf.profile.sag(x, y) + z_bias
+
+      # Append the coordinates to volume_mesh
+      volume_mesh[0].extend(x)
+      volume_mesh[1].extend(y)
+      volume_mesh[2].extend(z)
 
       z_bias +=  sm.gaps[surf_num].thi
 
@@ -75,7 +90,7 @@ def visualize_lens(sm, N = 100 , radius = 2):
       # Adds mesh to plotly data for plotting
       data.append(go.Mesh3d(x=x, y=z, z=y, i=i, j=j, k=k, color='lightblue', opacity=0.5))
 
-      if prev_mesh == [[],[],[]]:
+      if all([len(array) == 0 for array in prev_mesh]):
         continue
       if(sm.rndx[surf_num] == [1.0, 1.0, 1.0]):
         lens = True
