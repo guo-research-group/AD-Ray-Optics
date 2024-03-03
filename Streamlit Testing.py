@@ -48,27 +48,31 @@ sm.add_surface([21.896, 4.822])
 sm.add_surface([86.759, 3.127, 'N-LAK9', 'Schott'])
 sm.add_surface([-20.4942, 41.2365])
 
-
-# update the model
-opm.update_model()
-data = visualize_lens(sm, radius = 7)
-data.extend(visualize_rays(sm,0,6,wv,x_offsets=np.linspace(-3,3,5), y_offsets=np.linspace(-5,1,5), color = "red"))
-figure = go.Figure(data = data)
-figure.update_scenes(aspectmode='data')
-# Update the size of the chart
-figure.update_layout(
-    autosize=False,
-    width=500,
-    height=500,
-)
-col2.plotly_chart(figure)
 """
-
-  
-  code = col1.text_area("Code", value = def_code, height = 400)
-  exec(code)
+ 
+  code = col1.text_area("code",value = def_code, height = 350)
   if col1.button("Run"):
     exec(code)
+  opm.update_model()
+  data = visualize_lens(sm, radius = 7)
+  data.extend(visualize_rays(sm,0,6,wv,x_offsets=np.linspace(-3,3,5), y_offsets=np.linspace(-3,3,5), color = "red"))
+  figure = go.Figure(data = data)
+  figure.update_scenes(aspectmode='data')
+  # Update the size of the chart
+  figure.update_layout(
+    autosize=True,
+    showlegend = False,
+    width=500,
+    height=350,
+    margin=dict(
+        l=0,  # left margin
+        r=0,  # right margin
+        b=0,  # bottom margin
+        t=0,  # top margin
+        pad=10  # padding
+    )
+  )
+  col2.plotly_chart(figure)
   
 def page2():
   st.title("Lens Visualisation - Simple Interactive")
