@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from scipy.spatial import *
 import numpy as np
 
-def visualize_lens(sm, N = 100 , radius = 2):
+def visualize_lens(sm, N = 100 , radius = 2, visibility = True):
     """
     This function visualizes a lens system by creating a 3D mesh for each surface in the system.
 
@@ -15,6 +15,7 @@ def visualize_lens(sm, N = 100 , radius = 2):
     sm (System): The optical system to visualize.
     N (int): The number of points along each axis to use for the mesh. The total number of points is N^2.
     radius (float): The radius of the lens. 
+    visibility (bool): visibility of the lens
 
     Returns:
     data (list): A list of plotly Mesh3d objects, one for each surface in the system.
@@ -38,6 +39,9 @@ def visualize_lens(sm, N = 100 , radius = 2):
       mesh = [[],[],[]]
       surf = sm.ifcs[surf_num]
       sd = np.max([surf.surface_od(),sd])
+      # Create an array of angles
+      angles = np.linspace(0,np.pi, 50)
+
       # Create a grid of x and y coordinates
       x, y = np.meshgrid(np.linspace(-sd, sd, N), np.linspace(-sd, sd, N))
 
@@ -46,6 +50,8 @@ def visualize_lens(sm, N = 100 , radius = 2):
 
       # Apply the mask to the x and y coordinates
       x, y = x[mask], y[mask]
+      x = np.concatenate([x, radius * np.cos(angles)])
+      y = np.concatenate([y, radius * np.sin(angles)])
 
       # Compute the z coordinates
       z = surf.profile.sag(x, y) + z_bias
@@ -55,40 +61,31 @@ def visualize_lens(sm, N = 100 , radius = 2):
       # Apply the mask to the x, y, and z coordinates
       x, y, z = x[mask], y[mask], z[mask]
 
-      # Create the mesh
-      mesh = [x, y, z]
-      # Create an array of angles
-      angles = np.linspace(0, np.pi, 360)
+      # Create masks for positive and negative y values
+      posy_mask = y >= 0
 
-      # Compute the x and y coordinates
-      x = radius * np.cos(angles)
-      y = radius * np.sin(angles)
-
+      # Apply the masks to the x, y, and z coordinates
+      x_pos, y_pos, z_pos = x[posy_mask], y[posy_mask], z[posy_mask]
+    
+      points = np.vstack([x_pos, y_pos]).T
+      tri = Delaunay(points)
+      i, j, k = tri.simplices.T
+      data.append(go.Mesh3d(x=x_pos, y=z_pos, z=y_pos, i=i, j=j, k=k, color='lightblue', opacity=0.5, visible= visibility))
+      data.append(go.Mesh3d(x=x_pos, y=z_pos, z=-y_pos, i=i, j=j, k=k, color='lightblue', opacity=0.5, visible= visibility))
+      
+    
+      x_ang = radius * np.cos(angles)
+      y_ang = radius * np.sin(angles)    
       # Compute the z coordinates
-      z = surf.profile.sag(x, y) + z_bias
+      z = surf.profile.sag(x_ang, y_ang) + z_bias
 
       # Append the coordinates to volume_mesh
-      volume_mesh[0].extend(x)
-      volume_mesh[1].extend(y)
+      volume_mesh[0].extend(x_ang)
+      volume_mesh[1].extend(y_ang)
       volume_mesh[2].extend(z)
 
       z_bias +=  sm.gaps[surf_num].thi
 
-      #Prepare mesh data for Delaunay
-      x = mesh[0]
-      y = mesh[1]
-      z = mesh[2]
-
-      points = np.vstack([x, y]).T
-
-      # Perform Delaunay triangulation
-      tri = Delaunay(points)
-
-      # The indices of the triangles are stored in the `simplices` attribute
-      i, j, k = tri.simplices.T
-
-      # Adds mesh to plotly data for plotting
-      data.append(go.Mesh3d(x=x, y=z, z=y, i=i, j=j, k=k, color='lightblue', opacity=0.5))
 
       if all([len(array) == 0 for array in prev_mesh]):
         continue
@@ -107,8 +104,9 @@ def visualize_lens(sm, N = 100 , radius = 2):
 
         # The indices of the triangles are stored in the `simplices` attribute
         i, j, k = tri.simplices.T
-        data.append(go.Mesh3d(x=x, y=z, z=y, i=i, j=j, k=k, color='lightblue', opacity=0.5))
-        data.append(go.Mesh3d(x=x, y=z, z=-y, i=i, j=j, k=k, color='lightblue', opacity=0.5))
+        print(x,y,z)
+        data.append(go.Mesh3d(x=x, y=z, z=y, i=i, j=j, k=k, color='lightblue', opacity=0.5, visible= True))
+        data.append(go.Mesh3d(x=x, y=z, z=-y, i=i, j=j, k=k, color='lightblue', opacity=0.5, visible= True))
         lens = False
       
     return data
