@@ -4,9 +4,13 @@ import plotly.graph_objects as go
 import numpy as np
 from scipy.spatial import *
 from rayoptics.raytr.trace import *
+from multiprocessing import Pool
 
+def trace_ray(args):
+    sm, st_coord, st_dir, wv = args
+    return trace(sm, st_coord, st_dir, wvl=wv)
 
-def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[0], y_offsets=[0], num_rays= 1, color = 'green'):
+def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[0], y_offsets=[0], num_rays= 1, color = 'green', visibility = True):
     """
     This function visualizes rays in an optical system by creating a 3D scatter plot for each ray.
 
@@ -29,55 +33,87 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
     """
 
     if max_angle is not None:
-         # Tan Angle Offsets
         angle_offsets = np.linspace(-max_angle, max_angle, num_rays)
     else:
         angle_offsets = [0]
 
-    #Stores Figure data
     data = []
+    ouptut = []
+    # Create a grid of x_offsets, y_offsets, rays, and ray_angles
+    x_offset_grid, y_offset_grid, ray_grid, ray_angle_grid = np.meshgrid(x_offsets, y_offsets, angle_offsets, angle_offsets)
 
-    # Creates each starting coordinate with the y_offset
-    idx = 1
-    for x_offset in x_offsets:
-      for y_offset in y_offsets:
-        for ray in angle_offsets: # Creates each tan angle offset
-          for ray_angle in angle_offsets:  # Creates each inc angle
-                #Sets incident angle and finds ray direction
-                if (x_offset ** 2 + y_offset ** 2 > radius ** 2):
-                  continue
-                inc_angle = ray_angle
-                si = np.sin(inc_angle)
-                cs = np.cos(inc_angle)
-                tn = np.tan(ray)
+    # Compute the condition
+    condition = x_offset_grid**2 + y_offset_grid**2 <= radius ** 2
+    # Apply the condition to the grids
+    x_offset_grid = x_offset_grid[condition]
+    y_offset_grid = y_offset_grid[condition]
+    ray_grid = ray_grid[condition]
+    ray_angle_grid = ray_angle_grid[condition]
 
-                st_coord = np.array([x_offset ,y_offset, 0]) # Ray start Co-ord (Add offsets here to alter starting position)
 
-                st_dir = np.array([tn,si,cs]) # Ray starting direction
+    # Compute the sin and cos of the incident angles
+    si = np.sin(ray_angle_grid)
+    cs = np.cos(ray_angle_grid)
+    tn = np.tan(ray_grid)
+    
 
-                output = trace(sm, st_coord, st_dir, wvl=wv) #Traces Ray
+    # Compute the starting coordinates and directions
+    st_coord = np.stack([x_offset_grid, y_offset_grid, np.zeros_like(x_offset_grid)], axis=-1)
+    st_dir = np.stack([tn, si, cs], axis=-1)
 
-                #Collects coordinates of traced ray for visualization
-                pt_photosensor = output[0][-1][0]
-                if np.abs(pt_photosensor[1]) <= 50:
-                    x = []
-                    y = []
-                    z = []
-                    z_bias = 0
-                    j = 0
-                    for pt in output[0][0::]:
-                        y.append(pt[0][1])
-                        z.append(pt[0][2]+z_bias)
-                        x.append(pt[0][0])
-                        if j < len(sm.gaps):
-                            z_bias += sm.gaps[j].thi
-                            j += 1
+    # Trace the rays
+    args = [(sm, coord, dir, wv) for coord, dir in zip(st_coord, st_dir)]
+    # Create a pool of workers
+    with Pool() as pool:
+        output = pool.map(trace_ray, args)
 
-                    #Visualizes Ray
-                    data.append(go.Scatter3d(x=x, y=z, z=y, mode='lines', line=dict(color=color, width=1), opacity=0.5, name =f"Ray {idx}"))
+    # Initialize lists to store the coordinates of all rays and intersection points
+    x_rays = []
+    y_rays = []
+    z_rays = []
+    x_intersections = []
+    y_intersections = []
+    z_intersections = []
+    
+    for out in output:
+    #Collects coordinates of traced ray for visualization
+      pt_photosensor = out[0][-1][0]
+      if np.abs(pt_photosensor[1]) <= 50:
+          x = []
+          y = []
+          z = []
+          z_bias = 0
+          j = 0
+          for pt in out[0][0::]:
+              y.append(pt[0][1])
+              z.append(pt[0][2]+z_bias)
+              x.append(pt[0][0])
+              if j < len(sm.gaps):
+                  z_bias += sm.gaps[j].thi
+                  j += 1
 
-                    #Visualises intersection point of rays
-                    data.append(go.Scatter3d(x=x[::], y= z[::], z=y[::], mode = 'markers', marker=dict(color='black', size=1), showlegend = False))
+          # Add the coordinates of the ray to the lists
+          x_rays.extend(x)
+          y_rays.extend(z)
+          z_rays.extend(y)
 
-                    idx += 1
+          # Add the coordinates of the intersection point to the lists
+          x_intersections.extend(x[::])
+          y_intersections.extend(z[::])
+          z_intersections.extend(y[::])
+
+      # Convert the lists to NumPy arrays
+    x_rays = np.array(x_rays)
+    y_rays = np.array(y_rays)
+    z_rays = np.array(z_rays)
+    x_intersections = np.array(x_intersections)
+    y_intersections = np.array(y_intersections)
+    z_intersections = np.array(z_intersections)
+
+    # Create a Scatter3d object for the rays
+    data.append(go.Scatter3d(x=x_rays, y=y_rays, z=z_rays, mode='lines', line=dict(color=color, width=1), opacity=0.5, visible=visibility))
+
+    # Create a Scatter3d object for the intersection points
+    data.append(go.Scatter3d(x=x_intersections, y=y_intersections, z=z_intersections, mode='markers', marker=dict(color='black', size=1), showlegend=False, visible=visibility))
+
     return data

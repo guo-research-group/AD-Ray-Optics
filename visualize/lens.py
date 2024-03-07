@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from scipy.spatial import *
 import numpy as np
 
-def visualize_lens(sm, N = 100 , radius = 2, visibility = True):
+def visualize_lens(sm, N = 10 , radius = 2, visibility = True):
     """
     This function visualizes a lens system by creating a 3D mesh for each surface in the system.
 
@@ -40,7 +40,7 @@ def visualize_lens(sm, N = 100 , radius = 2, visibility = True):
       surf = sm.ifcs[surf_num]
       sd = np.max([surf.surface_od(),sd])
       # Create an array of angles
-      angles = np.linspace(0,np.pi, 50)
+      angles = np.linspace(0,np.pi, N)
 
       # Create a grid of x and y coordinates
       x, y = np.meshgrid(np.linspace(-sd, sd, N), np.linspace(-sd, sd, N))
@@ -60,7 +60,7 @@ def visualize_lens(sm, N = 100 , radius = 2, visibility = True):
 
       # Apply the mask to the x, y, and z coordinates
       x, y, z = x[mask], y[mask], z[mask]
-
+      mesh = [x,y,z]
       # Create masks for positive and negative y values
       posy_mask = y >= 0
 
@@ -104,9 +104,8 @@ def visualize_lens(sm, N = 100 , radius = 2, visibility = True):
 
         # The indices of the triangles are stored in the `simplices` attribute
         i, j, k = tri.simplices.T
-        print(x,y,z)
-        data.append(go.Mesh3d(x=x, y=z, z=y, i=i, j=j, k=k, color='lightblue', opacity=0.5, visible= True))
-        data.append(go.Mesh3d(x=x, y=z, z=-y, i=i, j=j, k=k, color='lightblue', opacity=0.5, visible= True))
+        data.append(go.Mesh3d(x=x, y=z, z=y, i=i, j=j, k=k, color='lightblue', opacity=0.5, visible=visibility))
+        data.append(go.Mesh3d(x=x, y=z, z=-y, i=i, j=j, k=k, color='lightblue', opacity=0.5, visible=visibility))
         lens = False
       
     return data
