@@ -40,7 +40,7 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
     data = []
     ouptut = []
     # Create a grid of x_offsets, y_offsets, rays, and ray_angles
-    x_offset_grid, y_offset_grid, ray_grid, ray_angle_grid = np.meshgrid(x_offsets, y_offsets, angle_offsets, angle_offsets)
+    x_offset_grid, y_offset_grid, ray_grid, ray_angle_grid = np.meshgrid(np.array(x_offsets), np.array(y_offsets), np.array(angle_offsets), np.array(angle_offsets))
 
     # Compute the condition
     condition = x_offset_grid**2 + y_offset_grid**2 <= radius ** 2
