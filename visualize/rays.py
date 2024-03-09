@@ -55,7 +55,7 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
     si = np.sin(ray_angle_grid)
     cs = np.cos(ray_angle_grid)
     tn = np.tan(ray_grid)
-    
+
 
     # Compute the starting coordinates and directions
     st_coord = np.stack([x_offset_grid, y_offset_grid, np.zeros_like(x_offset_grid)], axis=-1)
@@ -74,7 +74,7 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
     x_intersections = []
     y_intersections = []
     z_intersections = []
-    
+
     for out in output:
     #Collects coordinates of traced ray for visualization
       pt_photosensor = out[0][-1][0]
@@ -114,6 +114,6 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
     data.append(go.Scatter3d(x=x_rays, y=y_rays, z=z_rays, mode='lines', line=dict(color=color, width=1), opacity=0.5, visible=visibility))
 
     # Create a Scatter3d object for the intersection points
-    data.append(go.Scatter3d(x=x_intersections, y=y_intersections, z=z_intersections, mode='markers', marker=dict(color='black', size=1), showlegend=False, visible=visibility))
+    data.append(go.Scatter3d(x=x_intersections, y=y_intersections, z=z_intersections, mode='markers', marker=dict(color='black', size=1), showlegend=False))
 
     return data
