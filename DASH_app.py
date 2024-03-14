@@ -1,0 +1,105 @@
+import dash
+import dash_ace
+from dash import dcc
+from dash import html
+from dash.dependencies import Input, Output
+import plotly.graph_objects as go
+import numpy as np
+from rayoptics.environment import *
+from visualize.lens import visualize_lens
+from visualize.rays import visualize_rays
+
+# create a new optical model and set up aliases
+opm = OpticalModel()
+sm = opm['seq_model']
+osp = opm['optical_spec']
+
+# define field specs
+osp['pupil'] = PupilSpec(osp, key=['object', 'pupil'], value=12.5)
+osp['fov'] = FieldSpec(osp, key=['object', 'angle'], value=20, flds=[0, 0.707, 1], is_relative=True)
+osp['wvls'] = WvlSpec([('F', 0.5), (587.5618, 1.0), ('C', 0.5)], ref_wl=1)
+wv = 587.5618
+
+app = dash.Dash(__name__)
+
+def_code = """# add the surfaces
+sm.add_surface([23.713, 4.831, 'N-LAK9', 'Schott'])
+sm.add_surface([7331.288, 5.86])
+sm.add_surface([-24.456, .975, 'N-SF5,Schott'])
+sm.add_surface([21.896, 4.822])
+sm.add_surface([86.759, 3.127, 'N-LAK9', 'Schott'])
+sm.add_surface([-20.4942, 41.2365]) 
+"""
+
+
+app.layout = html.Div([
+    dcc.Slider(id='init_gap', min=0, max=50, value=1, step=1),
+    dash_ace.DashAceEditor(
+        id='code',
+        value=def_code,
+        theme='monokai',
+        mode='python',
+        height='300px',
+        width='100%'
+    ),
+    html.Button('Run', id='run_button'),
+    dcc.Dropdown(id='ray_option', options=[{'label': 'Paralell', 'value': 'Paralell'}, {'label': 'Point Source', 'value': 'Point Source'}], value='Paralell'),
+    html.Button('Reset', id='reset_button'),
+    dcc.Slider(id='ray_mult', min=0, max=1, value=0.5, step=0.1),
+    dcc.Graph(id='figure')
+])
+
+@app.callback(
+    Output('figure', 'figure'),
+    [Input('run_button', 'n_clicks'), Input('reset_button', 'n_clicks'), Input('ray_option', 'value'), Input('ray_mult', 'value'), Input('init_gap', 'value'), Input('code', 'value')]
+)
+def update_figure(run_clicks, reset_clicks, ray_option, ray_mult, init_gap, code):
+    # Your code to update the figure goes here
+    # You'll need to use the inputs to determine what to do
+    # For example, if run_clicks > 0, you might want to execute the code
+    # If reset_clicks > 0, you might want to reset the model
+    # You'll use ray_option and ray_mult to determine how to visualize the rays
+    # And you'll use init_gap to set the initial gap
+    # Finally, you'll return the figure
+    global opm, sm, osp
+    if reset_clicks and (not run_clicks or reset_clicks > run_clicks):
+        opm = OpticalModel()
+        sm = opm['seq_model']
+        osp = opm['optical_spec']
+        osp['pupil'] = PupilSpec(osp, key=['object', 'pupil'], value=12.5)
+        osp['fov'] = FieldSpec(osp, key=['object', 'angle'], value=20, flds=[0, 0.707, 1], is_relative=True)
+        osp['wvls'] = WvlSpec([('F', 0.5), (587.5618, 1.0), ('C', 0.5)], ref_wl=1)
+        opm.update_model()
+
+    elif run_clicks and (not reset_clicks or run_clicks > reset_clicks):
+        sm.gaps[0].thi = init_gap
+        opm.radius_mode = True
+        exec(code)
+        data = visualize_lens(sm, radius = 7)
+        if ray_option == "Paralell":
+            data.extend(visualize_rays(sm,0,6,wv,x_offsets=np.linspace(-3,3,5), y_offsets=np.linspace(-3,3,5), color = "red"))
+        else:
+            data.extend(visualize_rays(sm,np.pi * ray_mult,6,wv, color = "red", num_rays = 5))
+        figure = go.Figure(data = data)
+        figure.update_scenes(aspectmode='data')
+        # Update the size of the chart
+        figure.update_layout(
+            autosize=True,
+            showlegend = False,
+            height=500,
+            margin=dict(
+                l=0,  # left margin
+                r=0,  # right margin
+                b=0,  # bottom margin
+                t=0,  # top margin
+                pad=10  # padding
+            )
+        )
+        opm.update_model()
+    else:
+        figure = go.Figure()
+    return figure
+     
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
