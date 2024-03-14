@@ -91,29 +91,13 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
               if j < len(sm.gaps):
                   z_bias += sm.gaps[j].thi
                   j += 1
+        # Create a Scatter3d object for the rays
+          data.append(go.Scatter3d(x=x, y=y, z=z, mode='lines', line=dict(color=color, width=1), opacity=0.5, visible=visibility))
 
-          # Add the coordinates of the ray to the lists
-          x_rays.extend(x)
-          y_rays.extend(z)
-          z_rays.extend(y)
+        # Create a Scatter3d object for the intersection points
+          data.append(go.Scatter3d(x=x[::], y=y[::], z=z[::], mode='markers', marker=dict(color='black', size=1), showlegend=False))
 
-          # Add the coordinates of the intersection point to the lists
-          x_intersections.extend(x[::])
-          y_intersections.extend(z[::])
-          z_intersections.extend(y[::])
+       
 
-      # Convert the lists to NumPy arrays
-    x_rays = np.array(x_rays)
-    y_rays = np.array(y_rays)
-    z_rays = np.array(z_rays)
-    x_intersections = np.array(x_intersections)
-    y_intersections = np.array(y_intersections)
-    z_intersections = np.array(z_intersections)
-
-    # Create a Scatter3d object for the rays
-    data.append(go.Scatter3d(x=x_rays, y=y_rays, z=z_rays, mode='lines', line=dict(color=color, width=1), opacity=0.5, visible=visibility))
-
-    # Create a Scatter3d object for the intersection points
-    data.append(go.Scatter3d(x=x_intersections, y=y_intersections, z=z_intersections, mode='markers', marker=dict(color='black', size=1), showlegend=False))
 
     return data
