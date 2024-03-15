@@ -67,14 +67,6 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
     with Pool() as pool:
         output = pool.map(trace_ray, args)
 
-    # Initialize lists to store the coordinates of all rays and intersection points
-    x_rays = []
-    y_rays = []
-    z_rays = []
-    x_intersections = []
-    y_intersections = []
-    z_intersections = []
-
     for out in output:
     #Collects coordinates of traced ray for visualization
       pt_photosensor = out[0][-1][0]
@@ -92,10 +84,10 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
                   z_bias += sm.gaps[j].thi
                   j += 1
         # Create a Scatter3d object for the rays
-          data.append(go.Scatter3d(x=x, y=y, z=z, mode='lines', line=dict(color=color, width=1), opacity=0.5, visible=visibility))
+          data.append(go.Scatter3d(x=x, y=z, z=y, mode='lines', line=dict(color=color, width=1), opacity=0.5, visible=visibility))
 
         # Create a Scatter3d object for the intersection points
-          data.append(go.Scatter3d(x=x[::], y=y[::], z=z[::], mode='markers', marker=dict(color='black', size=1), showlegend=False))
+          data.append(go.Scatter3d(x=x[::], y=z[::], z=y[::], mode='markers', marker=dict(color='black', size=1), showlegend=False))
 
        
 

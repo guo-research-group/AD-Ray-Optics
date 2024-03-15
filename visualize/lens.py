@@ -62,7 +62,7 @@ def visualize_lens(sm, N = 10 , radius = 2, visibility = True):
       x, y, z = x[mask], y[mask], z[mask]
       mesh = [x,y,z]
       # Create masks for positive and negative y values
-      posy_mask = y >= 0
+      posy_mask = y >= -1
 
       # Apply the masks to the x, y, and z coordinates
       x_pos, y_pos, z_pos = x[posy_mask], y[posy_mask], z[posy_mask]
