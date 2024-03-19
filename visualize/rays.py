@@ -64,30 +64,28 @@ def visualize_rays(sm=None, max_angle=None, radius=10, wv= 400.5618, x_offsets=[
     # Trace the rays
     args = [(sm, coord, dir, wv) for coord, dir in zip(st_coord, st_dir)]
     # Create a pool of workers
-    with Pool() as pool:
-        output = pool.map(trace_ray, args)
-
-    for out in output:
+    for coord, dir in zip(st_coord, st_dir):
+        output = trace(sm, coord, dir, wvl=wv)
     #Collects coordinates of traced ray for visualization
-      pt_photosensor = out[0][-1][0]
-      if np.abs(pt_photosensor[1]) <= 50:
-          x = []
-          y = []
-          z = []
-          z_bias = 0
-          j = 0
-          for pt in out[0][0::]:
-              y.append(pt[0][1])
-              z.append(pt[0][2]+z_bias)
-              x.append(pt[0][0])
-              if j < len(sm.gaps):
-                  z_bias += sm.gaps[j].thi
-                  j += 1
-        # Create a Scatter3d object for the rays
-          data.append(go.Scatter3d(x=x, y=z, z=y, mode='lines', line=dict(color=color, width=1), opacity=0.5, visible=visibility))
+        pt_photosensor = output[0][-1][0]
+        if np.abs(pt_photosensor[1]) <= 50:
+            x = []
+            y = []
+            z = []
+            z_bias = 0
+            j = 0
+            for pt in output[0][0::]:
+                y.append(pt[0][1])
+                z.append(pt[0][2]+z_bias)
+                x.append(pt[0][0])
+                if j < len(sm.gaps):
+                    z_bias += sm.gaps[j].thi
+                    j += 1
+            # Create a Scatter3d object for the rays
+            data.append(go.Scatter3d(x=x, y=z, z=y, mode='lines', line=dict(color=color, width=1), opacity=0.5, visible=visibility))
 
-        # Create a Scatter3d object for the intersection points
-          data.append(go.Scatter3d(x=x[::], y=z[::], z=y[::], mode='markers', marker=dict(color='black', size=1), showlegend=False))
+            # Create a Scatter3d object for the intersection points
+            data.append(go.Scatter3d(x=x[::], y=z[::], z=y[::], mode='markers', marker=dict(color='black', size=1), showlegend=False))
 
        
 
