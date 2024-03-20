@@ -9,11 +9,10 @@ from rayoptics.environment import *
 from visualize.lens import visualize_lens
 from visualize.rays import visualize_rays
 
-
 wv = 587.5618
 
 app = dash.Dash(__name__)
-
+server = app.server
 def_code = """# add the surfaces
 sm.add_surface([23.713, 4.831, 'N-LAK9', 'Schott'])
 sm.add_surface([7331.288, 5.86])
