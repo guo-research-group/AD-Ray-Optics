@@ -70,6 +70,7 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code):
     # And you'll use init_gap to set the initial gap
     # Finally, you'll return the figure
     global opm, sm, osp
+    figure = go.Figure()
     if run_clicks:
         # create a new optical model and set up aliases
         opm = OpticalModel()
