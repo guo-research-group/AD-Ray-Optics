@@ -16,3 +16,4 @@ ipython
 traitlets
 dash
 dash_ace
+plotly
