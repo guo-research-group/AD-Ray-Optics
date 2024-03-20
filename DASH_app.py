@@ -69,7 +69,6 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code):
     # You'll use ray_option and ray_mult to determine how to visualize the rays
     # And you'll use init_gap to set the initial gap
     # Finally, you'll return the figure
-    global opm, sm, osp
     figure = go.Figure()
     if run_clicks:
         # create a new optical model and set up aliases
@@ -109,4 +108,4 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code):
      
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()
