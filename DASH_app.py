@@ -8,11 +8,12 @@ import numpy as np
 from rayoptics.environment import *
 from visualize.lens import visualize_lens
 from visualize.rays import visualize_rays
-
+import plotly.io as pio
 wv = 587.5618
 
 app = dash.Dash(__name__)
 server = app.server
+
 def_code = """# add the surfaces
 sm.add_surface([23.713, 4.831, 'N-LAK9', 'Schott'])
 sm.add_surface([7331.288, 5.86])
@@ -30,6 +31,8 @@ app.layout = html.Div([
         fullscreen=False,
         children=[
             html.Div([
+            html.Label('Example Models'),
+            dcc.Dropdown(id = 'model_option', options =  [{'label': 'Default', 'value': 'Default'}, {'label': 'Custom', 'value': 'Custom'}], value = 'Default'),
             html.Label('Lens Code'),
             dash_ace.DashAceEditor(
                 id='code',
@@ -56,12 +59,21 @@ app.layout = html.Div([
          ]
     )
 ])
+@app.callback(
+    Output('code', 'value'),
+    [Input('model_option','value')]
+)
+def update_editor(model_option):
+    if model_option == 'Default':
+        return def_code
+    if model_option == 'Custom':
+        return ""
 
 @app.callback(
     Output('figure', 'figure'),
     [Input('run_button', 'n_clicks')],
-    [State('ray_option', 'value'), State('ray_mult', 'value'), State('init_gap', 'value'), State('code', 'value')])
-def update_figure(run_clicks, ray_option, ray_mult, init_gap, code):
+    [State('ray_option', 'value'), State('ray_mult', 'value'), State('init_gap', 'value'), State('code', 'value'), State('model_option', 'value')])
+def update_figure(run_clicks, ray_option, ray_mult, init_gap, code, model_option):
     # Your code to update the figure goes here
     # You'll need to use the inputs to determine what to do
     # For example, if run_clicks > 0, you might want to execute the code
@@ -70,6 +82,9 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code):
     # And you'll use init_gap to set the initial gap
     # Finally, you'll return the figure
     figure = go.Figure()
+    if code == def_code:
+        figure = pio.read_json("default.json") 
+        return figure
     if run_clicks:
         # create a new optical model and set up aliases
         opm = OpticalModel()
@@ -90,6 +105,7 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code):
         else:
             data.extend(visualize_rays(sm,np.pi * ray_mult,6,wv, color = "red", num_rays = 5))
         figure = go.Figure(data = data)
+        pio.write_json(figure, "default.json")
         figure.update_scenes(aspectmode='data')
         # Update the size of the chart
         figure.update_layout(
@@ -104,8 +120,9 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code):
                 pad=10  # padding
             )
         )
+        
     return figure
      
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True, port=8050)
