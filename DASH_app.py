@@ -15,8 +15,6 @@ wv = 587.5618
 app = dash.Dash(__name__)
 server = app.server
 
-global def_code
-def_code = ""
 
 app.layout = html.Div([
     dcc.Loading(
@@ -26,14 +24,14 @@ app.layout = html.Div([
         children=[
             html.Div([
             html.Label('Example Models'),
-            dcc.Dropdown(id = 'model_option', options =  [{'label': 'OPTI_517', 'value': 'opti_517'}, {'label': 'Custom', 'value': 'Custom'}], value = 'Custom'),
+            dcc.Dropdown(id = 'model_option', options =  [{'label': 'OPTI_517', 'value': 'opti_517'},{'label': 'Paralell Zoom','value': 'p_zoom'}, {'label': 'Custom', 'value': 'custom'}], value = 'custom'),
             html.Label('Lens Code'),
             dash_ace.DashAceEditor(
                 id='code',
-                value=def_code,
+                value="",
                 theme='monokai',
                 mode='python',
-                height='500px',
+                height='350px',
                 width='100%'
             ),
             html.Br(),
@@ -43,6 +41,8 @@ app.layout = html.Div([
             dcc.Slider(id='ray_mult', min=0, max=1, value=0.5, step=None),
             html.Label('Initial Gap'),
             dcc.Slider(id='init_gap', min=0, max=50, value=1, step=None),
+            html.Label('Lens Radius'),
+            dcc.Slider(id='rad', min=0, max=10, value=2, step=None),
             html.Button('Run', id='run_button', style={'margin': '10px'}), 
             ], style={'width': '49%', 'display': 'inline-block'}),
 
@@ -59,7 +59,7 @@ app.layout = html.Div([
 )
 def update_editor(model_option):
     if model_option == 'opti_517':
-        def_code = """# add the surfaces
+        return """# add the surfaces
 sm.add_surface([23.713, 4.831, 'N-LAK9', 'Schott'])
 sm.add_surface([7331.288, 5.86])
 sm.add_surface([-24.456, .975, 'N-SF5,Schott'])
@@ -67,16 +67,46 @@ sm.add_surface([21.896, 4.822])
 sm.add_surface([86.759, 3.127, 'N-LAK9', 'Schott'])
 sm.add_surface([-20.4942, 41.2365]) 
 """
-        return def_code
-    if model_option == 'Custom':
-        def_code = "" # add the surfaces
-        return def_code
+    elif model_option == 'p_zoom':
+        return """# add the surfaces
+pupil_r = 1.5
+n = 1.5
+# Do not adjust above values
+R2 = -8 
+zoom_adjust = -0.25 # Choose either -0.25 or 0 or 0.5
+
+sm.add_surface([-R2, 1, n, pupil_r])
+#sm.ifcs[sm.cur_surface].profile = RadialPolynomial(r=abs(R2), coefs=p2)
+sm.set_stop()
+sm.add_surface([R2, 1+zoom_adjust, n-0.5, pupil_r])
+sm.set_stop()
+sm.add_surface([R2+3, 0, n+0.5, pupil_r])
+sm.set_stop()
+sm.add_surface([-R2-3, 1, n-0.5, pupil_r])
+sm.set_stop()
+sm.add_surface([-R2, 1, n, pupil_r])
+sm.set_stop()
+sm.add_surface([R2, 1.75, n-0.5, pupil_r])
+sm.set_stop()
+sm.add_surface([-R2-3, 1.7, n, pupil_r])
+sm.set_stop()
+if zoom_adjust > 0:
+    sm.add_surface([R2+3, 1, n-0.5, pupil_r])
+    sm.set_stop()
+elif zoom_adjust == 0:
+    sm.add_surface([R2+3, 1.5, n-0.5, pupil_r])
+    sm.set_stop()
+else:
+    sm.add_surface([R2+3, 1.6, n-0.5, pupil_r])
+    sm.set_stop()"""
+    else:
+        return ""
 
 @app.callback(
     Output('figure', 'figure'),
     [Input('run_button', 'n_clicks')],
-    [State('ray_option', 'value'), State('ray_mult', 'value'), State('init_gap', 'value'), State('code', 'value'), State('model_option', 'value')])
-def update_figure(run_clicks, ray_option, ray_mult, init_gap, code, model_option):
+    [State('ray_option', 'value'), State('ray_mult', 'value'), State('init_gap', 'value'), State('code', 'value'), State('rad', 'value')])
+def update_figure(run_clicks, ray_option, ray_mult, init_gap, code, rad):
     # Your code to update the figure goes here
     # You'll need to use the inputs to determine what to do
     # For example, if run_clicks > 0, you might want to execute the code
@@ -99,11 +129,11 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code, model_option
         opm.radius_mode = True
         exec(code)
         opm.update_model()
-        data = visualize_lens(sm, N = 50, radius = 7)
+        data = visualize_lens(sm, 15, rad)
         if ray_option == "Paralell":
-            data.extend(visualize_rays(sm,0,6,wv,x_offsets=np.linspace(-3,3,5), y_offsets=np.linspace(-3,3,5), color = "red"))
+            data.extend(visualize_rays(sm,0, rad, wv,x_offsets=np.linspace(-rad,rad,5), y_offsets=np.linspace(-rad,rad,5), color = "red"))
         else:
-            data.extend(visualize_rays(sm,np.pi * ray_mult,6,wv, color = "red", num_rays = 5))
+            data.extend(visualize_rays(sm,np.pi * ray_mult, rad, wv, color = "red", num_rays = 5))
         figure = go.Figure(data = data)
         figure.update_scenes(aspectmode='data')
         # Update the size of the chart
