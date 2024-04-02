@@ -1,0 +1,1 @@
+web: gunicorn DASH_app:app
