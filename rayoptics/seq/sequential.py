@@ -22,6 +22,8 @@ from opticalglass import glassfactory as gfact
 from opticalglass import glasserror as ge
 from opticalglass import modelglass as mg
 from opticalglass import opticalmedium as om
+from rayoptics.oprops import doe
+
 
 import jax.numpy as np
 from jax.numpy import sqrt, copysign, sin
@@ -167,19 +169,19 @@ class SequentialModel:
 
     def reverse_path(self, wl=None, start=None, stop=None, step=-1):
         """ returns an iterable path tuple for a range in the sequential model
-    
+
         Args:
             wl: wavelength in nm for path, defaults to central wavelength
             start: start of range
             stop: first value beyond the end of the range
             step: increment or stride of range
-    
+
         Returns:
             (**ifcs, gaps, lcl_tfrms, rndx, z_dir**)
         """
         if wl is None:
             wl = self.central_wavelength()
-    
+
         if step < 0:
             if start is not None:
                 gap_start = start - 1
@@ -189,7 +191,7 @@ class SequentialModel:
                 rndx_start = -1
         else:
             gap_start = start
-    
+
         tfrms = self.compute_local_transforms(step=-1)
         wl_idx = self.index_for_wavelength(wl)
         rndx = [n[wl_idx] for n in self.rndx[rndx_start:stop:step]]
@@ -322,7 +324,7 @@ class SequentialModel:
             if num_ifcs > 2:
                 if self.stop_surface > idx and self.stop_surface > 1:
                     self.stop_surface -= 1
-        
+
         # remove the associated nodes
         pt = self.opt_model['part_tree']
         pt.trim_node(self.ifcs[idx])
@@ -357,7 +359,7 @@ class SequentialModel:
             del self.lcl_tfrms[idx]
             del self.gbl_tfrms[idx]
 
-    def add_surface(self, surf_data, **kwargs):
+    def add_surface(self, surf_data, diffractive_element = 0, **kwargs):
         """ add a surface where `surf_data` is a list that contains:
 
         [curvature, thickness, refractive_index, v-number, semi-diameter]
@@ -376,16 +378,24 @@ class SequentialModel:
             - blank -> defaults to om.Air
             - **'REFL'** -> set interact_mode to 'reflect'
 
-        The `semi-diameter` entry is optional. It may also be entered using the 
+        The `semi-diameter` entry is optional. It may also be entered using the
         `sd` keyword argument.
+
+        diffractive_element is list that contains:
+
+        [ p, surface_idx]
+
+        The 'p' is list of coefficients of phase parameters
+
+        The 'surface_idx' is index of which element diffractive element is being a
 
         """
         radius_mode = self.opt_model.radius_mode
         mat = None
         if len(surf_data) > 2:
             if not isanumber(surf_data[2]):
-                if (isinstance(surf_data[2], str) 
-                    and 
+                if (isinstance(surf_data[2], str)
+                    and
                     surf_data[2].upper() == 'REFL'):
                     mat = self.gaps[self.cur_surface].medium
         s, g, z_dir, rn, tfrm = create_surface_and_gap(surf_data,
@@ -399,6 +409,12 @@ class SequentialModel:
         Node(f'i{idx}', id=s, tag='#ifc', parent=root_node)
         if gap is not None:
             Node(f'g{idx}', id=(g, self.z_dir[idx]), tag='#gap', parent=root_node)
+
+        if diffractive_element:
+          p = diffractive_element[0]
+          surface_idx = diffractive_element[1]
+          self.ifcs[1].phase_element = doe.DiffractiveElement(coefficients=p,phase_fct = doe.radial_phase_fct)
+
 
     def sync_to_restore(self, opt_model):
         self.opt_model = opt_model
@@ -424,7 +440,7 @@ class SequentialModel:
 
         self.ifcs[0].interact_mode = 'dummy'
         self.ifcs[-1].interact_mode = 'dummy'
-                
+
         if not hasattr(self, 'do_apertures'):
             self.do_apertures = True
 
@@ -453,10 +469,10 @@ class SequentialModel:
                 n_after = self.rndx[i][ref_wl]
                 #if z_dir_after < 0:
                     #n_after = -n_after
-                n_after *= np.sign(z_dir_after) #changed    
+                n_after *= np.sign(z_dir_after) #changed
                 ifc.delta_n = n_after - n_before
                 n_before = n_after
-    
+
                 z_dir_before = z_dir_after
                 self.z_dir[i] = z_dir_after
 
@@ -717,7 +733,7 @@ class SequentialModel:
                 o_str += (gap_str[:semicolon_indx] +
                           f" ({int(z_dir):+})" +
                           gap_str[semicolon_indx:] + '\n')
-        
+
         o_str += f'\ndo apertures: {self.do_apertures}'
         return o_str
 
@@ -905,7 +921,7 @@ class SequentialModel:
                 except StopIteration:
                     break
             tfrms.reverse()
-    
+
         seq = itertools.zip_longest(self.ifcs[glo:], self.gaps[glo:])
         b4_ifc, b4_gap = before = next(seq)
         prev = np.identity(3), np.array([0., 0., 0.])
@@ -922,7 +938,7 @@ class SequentialModel:
                 before, b4_ifc, b4_gap = after, ifc, gap
             except StopIteration:
                 break
-    
+
         return tfrms
 
     def compute_local_transforms(self, seq=None, step=1):
@@ -1012,13 +1028,13 @@ def create_surface_and_gap(surf_data, radius_mode=False, prev_medium=None,
     """ create a surface and gap where `surf_data` is a list that contains:
 
     [curvature, thickness, refractive_index, v-number, semi-diameter]
-    
+
     The `curvature` entry is interpreted as radius if `radius_mode` is **True**
 
     The `thickness` is the signed thickness
 
     The `refractive_index, v-number` entry can have several forms:
-        
+
         - **refractive_index, v-number** (numeric)
         - **refractive_index** only -> constant index model
         - **glass_name, catalog_name** as 1 or 2 strings
@@ -1027,7 +1043,7 @@ def create_surface_and_gap(surf_data, radius_mode=False, prev_medium=None,
         - blank -> defaults to om.Air
         - **'REFL'** -> set interact_mode to 'reflect'
 
-    The `semi-diameter` entry is optional. It may also be entered using the 
+    The `semi-diameter` entry is optional. It may also be entered using the
     `sd` keyword argument.
     """
     s = surface.Surface()
