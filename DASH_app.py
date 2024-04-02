@@ -8,21 +8,15 @@ import numpy as np
 from rayoptics.environment import *
 from visualize.lens import visualize_lens
 from visualize.rays import visualize_rays
-import plotly.io as pio
+from plotly import io as pio
+
 wv = 587.5618
 
 app = dash.Dash(__name__)
 server = app.server
 
-def_code = """# add the surfaces
-sm.add_surface([23.713, 4.831, 'N-LAK9', 'Schott'])
-sm.add_surface([7331.288, 5.86])
-sm.add_surface([-24.456, .975, 'N-SF5,Schott'])
-sm.add_surface([21.896, 4.822])
-sm.add_surface([86.759, 3.127, 'N-LAK9', 'Schott'])
-sm.add_surface([-20.4942, 41.2365]) 
-"""
-
+global def_code
+def_code = ""
 
 app.layout = html.Div([
     dcc.Loading(
@@ -32,14 +26,14 @@ app.layout = html.Div([
         children=[
             html.Div([
             html.Label('Example Models'),
-            dcc.Dropdown(id = 'model_option', options =  [{'label': 'Default', 'value': 'Default'}, {'label': 'Custom', 'value': 'Custom'}], value = 'Default'),
+            dcc.Dropdown(id = 'model_option', options =  [{'label': 'OPTI_517', 'value': 'opti_517'}, {'label': 'Custom', 'value': 'Custom'}], value = 'Custom'),
             html.Label('Lens Code'),
             dash_ace.DashAceEditor(
                 id='code',
                 value=def_code,
                 theme='monokai',
                 mode='python',
-                height= '500px',
+                height='500px',
                 width='100%'
             ),
             html.Br(),
@@ -64,10 +58,19 @@ app.layout = html.Div([
     [Input('model_option','value')]
 )
 def update_editor(model_option):
-    if model_option == 'Default':
+    if model_option == 'opti_517':
+        def_code = """# add the surfaces
+sm.add_surface([23.713, 4.831, 'N-LAK9', 'Schott'])
+sm.add_surface([7331.288, 5.86])
+sm.add_surface([-24.456, .975, 'N-SF5,Schott'])
+sm.add_surface([21.896, 4.822])
+sm.add_surface([86.759, 3.127, 'N-LAK9', 'Schott'])
+sm.add_surface([-20.4942, 41.2365]) 
+"""
         return def_code
     if model_option == 'Custom':
-        return ""
+        def_code = "" # add the surfaces
+        return def_code
 
 @app.callback(
     Output('figure', 'figure'),
@@ -82,9 +85,6 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code, model_option
     # And you'll use init_gap to set the initial gap
     # Finally, you'll return the figure
     figure = go.Figure()
-    if code == def_code:
-        figure = pio.read_json("default.json") 
-        return figure
     if run_clicks:
         # create a new optical model and set up aliases
         opm = OpticalModel()
@@ -105,7 +105,6 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code, model_option
         else:
             data.extend(visualize_rays(sm,np.pi * ray_mult,6,wv, color = "red", num_rays = 5))
         figure = go.Figure(data = data)
-        pio.write_json(figure, "default.json")
         figure.update_scenes(aspectmode='data')
         # Update the size of the chart
         figure.update_layout(
