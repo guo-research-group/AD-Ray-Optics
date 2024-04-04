@@ -413,7 +413,7 @@ class SequentialModel:
         if diffractive_element:
           p = diffractive_element[0]
           surface_idx = diffractive_element[1]
-          self.ifcs[1].phase_element = doe.DiffractiveElement(coefficients=p,phase_fct = doe.radial_phase_fct)
+          self.ifcs[surface_idx].phase_element = doe.DiffractiveElement(coefficients=p,phase_fct = doe.radial_phase_fct)
 
 
     def sync_to_restore(self, opt_model):
