@@ -43,6 +43,8 @@ app.layout = html.Div([
             dcc.Slider(id='init_gap', min=0, max=50, value=1, step=None),
             html.Label('Lens Radius'),
             dcc.Slider(id='rad', min=0, max=10, value=2, step=None),
+            html.Label('Increase Focal Distance'),
+            dcc.Slider(id='focal', min=0, max=10, value=0, step=None),
             html.Button('Run', id='run_button', style={'margin': '10px'}), 
             ], style={'width': '49%', 'display': 'inline-block'}),
 
@@ -76,7 +78,6 @@ R2 = -8
 zoom_adjust = -0.25 # Choose either -0.25 or 0 or 0.5
 
 sm.add_surface([-R2, 1, n, pupil_r])
-#sm.ifcs[sm.cur_surface].profile = RadialPolynomial(r=abs(R2), coefs=p2)
 sm.set_stop()
 sm.add_surface([R2, 1+zoom_adjust, n-0.5, pupil_r])
 sm.set_stop()
@@ -105,8 +106,8 @@ else:
 @app.callback(
     Output('figure', 'figure'),
     [Input('run_button', 'n_clicks')],
-    [State('ray_option', 'value'), State('ray_mult', 'value'), State('init_gap', 'value'), State('code', 'value'), State('rad', 'value')])
-def update_figure(run_clicks, ray_option, ray_mult, init_gap, code, rad):
+    [State('ray_option', 'value'), State('ray_mult', 'value'), State('init_gap', 'value'), State('code', 'value'), State('rad', 'value'), State('focal','value')])
+def update_figure(run_clicks, ray_option, ray_mult, init_gap, code, rad, focal):
     # Your code to update the figure goes here
     # You'll need to use the inputs to determine what to do
     # For example, if run_clicks > 0, you might want to execute the code
@@ -128,6 +129,7 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code, rad):
         sm.gaps[0].thi = init_gap
         opm.radius_mode = True
         exec(code)
+        sm.gaps[-1].thi = sm.gaps[-1].thi + focal
         opm.update_model()
         data = visualize_lens(sm, 15, rad)
         if ray_option == "Paralell":
