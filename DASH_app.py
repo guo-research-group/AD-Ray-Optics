@@ -133,9 +133,9 @@ def update_figure(run_clicks, ray_option, ray_mult, init_gap, code, rad, focal):
         opm.update_model()
         data = visualize_lens(sm, 15, rad)
         if ray_option == "Paralell":
-            data.extend(visualize_rays(sm,0, rad, wv,x_offsets=np.linspace(-rad,rad,5), y_offsets=np.linspace(-rad,rad,5), color = "red"))
+            data.extend(visualize_rays(sm,0, rad, wv,x_offsets=np.linspace(-rad + 0.5,rad - 0.5,5), y_offsets=np.linspace(-rad + 0.5,rad - 0.5,5), color = "red"))
         else:
-            data.extend(visualize_rays(sm,np.pi * ray_mult, rad, wv, color = "red", num_rays = 5))
+            data.extend(visualize_rays(sm,np.pi * ray_mult, rad, wv, color = "red", num_rays = 10))
         figure = go.Figure(data = data)
         figure.update_scenes(aspectmode='data')
         # Update the size of the chart
