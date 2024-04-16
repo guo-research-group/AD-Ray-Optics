@@ -1,6 +1,7 @@
 anytree==2.12.1
 dash==2.14.2
 dash_ace==0.2.1
+depreciation
 gunicorn
 ipython==8.12.3
 ipywidgets==8.1.2
