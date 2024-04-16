@@ -1,0 +1,16 @@
+opticalglass
+numpy
+scipy
+matplotlib
+pandas
+anytree
+transforms3d
+requests
+packaging
+json_tricks
+deprecation
+ipywidgets
+pyqt5
+qdarkstyle
+ipython
+traitlets
