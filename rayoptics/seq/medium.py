@@ -272,10 +272,7 @@ class GlassHandlerBase():
 class Medium:
     """ Constant refractive index medium. """
 
-    @deprecation.deprecated(deprecated_in="0.8.4", removed_in="0.9.0",
-                            current_version=rayoptics.__version__,
-                            details="Use opticalglass.opticalmedium."
-                                    "ConstantIndex instead")
+    
     def __init__(self, nd, lbl, cat=''):
         self.label = lbl
         self.n = nd
