@@ -272,7 +272,6 @@ class GlassHandlerBase():
 class Medium:
     """ Constant refractive index medium. """
 
-    
     def __init__(self, nd, lbl, cat=''):
         self.label = lbl
         self.n = nd
