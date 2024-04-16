@@ -306,10 +306,7 @@ class Medium:
 class Air(Medium):
     """ Optical definition for air (low fidelity definition) """
 
-    @deprecation.deprecated(deprecated_in="0.8.4", removed_in="0.9.0",
-                            current_version=rayoptics.__version__,
-                            details="Use opticalglass.opticalmedium."
-                                    "Air instead")
+    
     def __init__(self):
         self.label = 'air'
         self.n = 1.0
@@ -331,10 +328,7 @@ class Air(Medium):
 class Glass(Medium):
     """ Optical medium defined by a glass code, i.e. index - V number pair """
 
-    @deprecation.deprecated(deprecated_in="0.8.4", removed_in="0.9.0",
-                            current_version=rayoptics.__version__,
-                            details="Use opticalglass.modelglass."
-                                    "ModelGlass instead")
+    
     def __init__(self, nd=1.5168, vd=64.17, mat='', cat=''):
         self.label = mat
         self._catalog_name = cat
@@ -388,10 +382,7 @@ class InterpolatedGlass():
         rindex_interp: the interpolation function
     """
 
-    @deprecation.deprecated(deprecated_in="0.8.4", removed_in="0.9.0",
-                            current_version=rayoptics.__version__,
-                            details="Use opticalglass.opticalmedium."
-                                    "InterpolatedMedium instead")
+    
     def __init__(self, label, pairs=None, rndx=None, wvls=None, cat=''):
         self.label = label
         self._catalog = cat
