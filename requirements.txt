@@ -3,7 +3,7 @@ dash==2.14.2
 dash_ace==0.2.1
 deprecation==2.1.0
 gunicorn
-ipython==8.12.3
+ipython==7.34.0
 ipywidgets==8.1.2
 jax
 jaxlib
@@ -12,7 +12,7 @@ matplotlib==3.8.4
 numpy==1.26.4
 opticalglass==1.0.7
 packaging==24.0
-pandas==2.2.2
+pandas==2.0.3
 plotly==5.9.0
 PyQt5==5.15.10
 PyQt5_sip==12.13.0
