@@ -12,7 +12,7 @@ opticalglass
 packaging
 pandas
 plotly
-PyQt5`
+PyQt5
 PyQt5_sip
 pytest
 QDarkStyle
