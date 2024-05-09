@@ -359,7 +359,7 @@ class SequentialModel:
             del self.lcl_tfrms[idx]
             del self.gbl_tfrms[idx]
 
-    def add_surface(self, surf_data, diffractive_element = 0, **kwargs):
+    def add_surface(self, surf_data, p = 0, f = 0, surface_idx = 0, **kwargs):
         """ add a surface where `surf_data` is a list that contains:
 
         [curvature, thickness, refractive_index, v-number, semi-diameter]
@@ -381,13 +381,12 @@ class SequentialModel:
         The `semi-diameter` entry is optional. It may also be entered using the
         `sd` keyword argument.
 
-        diffractive_element is list that contains:
-
-        [ p, surface_idx]
-
         The 'p' is list of coefficients of phase parameters
 
-        The 'surface_idx' is index of which element diffractive element is being a
+        The 'f' is the focal length (used by focal_phase_fct for diffractive elements)
+
+        The 'surface_idx' is index of which element diffractive element is being applied to
+
 
         """
         radius_mode = self.opt_model.radius_mode
@@ -410,10 +409,11 @@ class SequentialModel:
         if gap is not None:
             Node(f'g{idx}', id=(g, self.z_dir[idx]), tag='#gap', parent=root_node)
 
-        if diffractive_element:
-          p = diffractive_element[0]
-          surface_idx = diffractive_element[1]
+        if p:
           self.ifcs[surface_idx].phase_element = doe.DiffractiveElement(coefficients=p,phase_fct = doe.radial_phase_fct)
+        
+        else: #use f
+            self.ifcs[surface_idx].phase_element = doe.DiffractiveElement(phase_fct = doe.focal_phase_fct, f = f)
 
 
     def sync_to_restore(self, opt_model):

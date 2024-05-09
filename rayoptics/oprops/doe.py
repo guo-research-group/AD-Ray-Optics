@@ -51,6 +51,35 @@ def radial_phase_fct(pt, coefficients):
         factor = 2*(i+1)
         dWdX += factor*c*x*r_exp
         dWdY += factor*c*y*r_exp
+   
+    return dW, dWdX, dWdY
+
+def focal_phase_fct(pt,wl,f):
+    """Evaluate the phase and slopes at **pt** using focal length
+    Args:
+        pt: 3d point of incidence in :class:`~.Interface` coordinates
+        wl: wavelenght being analyzed
+        f: focal length of lens
+
+    Returns:
+        (**dW, dWdX, dWdY**)
+
+        - dW: phase added by diffractive interaction
+        - dWdX: slope in x direction
+        - dWdY: slope in y direction
+    """
+    
+    import math
+    x, y, z = pt
+    wl = wl*(10**-2)
+    r_sqr = x*x + y*y
+    dW = 0
+    dWdX = 0
+    dWdY = 0
+    p = 1.22*2*math.pi/wl
+    dW = p*(f - math.sqrt(r_sqr+f**2))
+    dWdX = -p * (x/math.sqrt(r_sqr+f**2))
+    dWdY = -p * (y/math.sqrt(r_sqr+f**2)) 
     return dW, dWdX, dWdY
 
 
@@ -63,10 +92,11 @@ class DiffractiveElement:
         ref_wl: wavelength in nm for phase measurement
         order: which diffracted order to calculate the phase for
         label: optical labeling for listing
+        f: focal length used in focal_phase_fct
     """
 
     def __init__(self, label='', coefficients=None, ref_wl=550., order=1,
-                 phase_fct=None):
+                 phase_fct=None, f=None):
         self.label = label
         if coefficients is None:
             self.coefficients = []
@@ -76,6 +106,7 @@ class DiffractiveElement:
         self.order = order
         self.phase_fct = phase_fct
         self.debug_output = False
+        self.f=f
 
     def __repr__(self):
         return (type(self).__name__ + '(label=' + repr(self.label) +
@@ -137,7 +168,10 @@ class DiffractiveElement:
             inc_dir = rt.bend(in_dir, srf_nrml, n_in, 1)
         in_cosI = np.dot(inc_dir, normal)
         mu = 1.0 if wl is None else wl/self.ref_wl
-        dW, dWdX, dWdY = self.phase_fct(pt, self.coefficients)
+        if self.f:
+            dW, dWdX, dWdY = self.phase_fct(pt, self.ref_wl, self.f)
+        else:
+            dW, dWdX, dWdY = self.phase_fct(pt, self.coefficients)
         # print(wl, mu, dW, dWdX, dWdY)
         b = in_cosI + order*mu*(normal[0]*dWdX + normal[1]*dWdY)
         c = mu*(mu*(dWdX**2 + dWdY**2)/2 +
