@@ -58,9 +58,15 @@ Details on Jax installation can be found https://github.com/google/jax
 
 ### 3D Visualization
 
-[Triplet Lens Example](https://colab.research.google.com/drive/1CvfLZNfCGWwjghBDEJNXqR49LCiE5BkP?usp=sharing)
+[Triplet Lens](https://colab.research.google.com/drive/1CvfLZNfCGWwjghBDEJNXqR49LCiE5BkP?usp=sharing)
 
-[Zooming Lens Example](https://colab.research.google.com/drive/1C-32HZodf7q7e0mvwoo_hNB0SBJutiYU?usp=sharing)
+[Zooming Lens](https://colab.research.google.com/drive/1C-32HZodf7q7e0mvwoo_hNB0SBJutiYU?usp=sharing)
 
-[Double Concave Lens Example](https://colab.research.google.com/drive/188g6NYWqOkJgRHDlwt__nL7yFQhq60oJ?usp=sharing)
+[Double Concave Lens](https://colab.research.google.com/drive/188g6NYWqOkJgRHDlwt__nL7yFQhq60oJ?usp=sharing)
+
+### Auto-Differentiation
+
+[Flat Lens Optimization](https://colab.research.google.com/drive/1yr9aB1K5c-yOvA_1gI6nMK9JAvB6eJkS?usp=sharing)
+
+
 

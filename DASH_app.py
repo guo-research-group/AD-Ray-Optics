@@ -8,7 +8,6 @@ import numpy as np
 from rayoptics.environment import *
 from visualize.lens import visualize_lens
 from visualize.rays import visualize_rays
-from plotly import io as pio
 
 wv = 587.5618
 
